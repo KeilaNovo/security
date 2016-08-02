@@ -1,0 +1,12 @@
+from flask import session as login_session 
+import random, string 
+
+
+#token es aquello que te facilita la posibilidad de verificar tu identidad reconociendo quien dices ser. Verificacion 
+#Create a new state token () to login and to prevent request forgery (falsificacion de peticion)
+@app.route('/login')
+def showLogin():
+    state = ''.join(random.choice(strig.ascii_uppercase + string.digits)
+              for x in xrange(32))
+    login_session['state']= state
+    return "The current session state is %s" % login_session['state'] 

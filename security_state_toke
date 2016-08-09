@@ -6,7 +6,7 @@ import random, string
 #Create a new state token () to login and to prevent request forgery (falsificacion de peticion)
 @app.route('/login')
 def showLogin():
-    state = ''.join(random.choice(strig.ascii_uppercase + string.digits)
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
               for x in xrange(32))
     login_session['state']= state
     return "The current session state is %s" % login_session['state'] 

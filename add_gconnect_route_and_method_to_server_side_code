@@ -1,0 +1,79 @@
+@app.route('/gconnect', methods = ['POST']) #genera un post request
+# Validacion del state token (token de estado)
+def gconnect():
+  if request.args.get('state') != login_session ['state']:
+  response = make_response(json.dumps('Invalid parameter .'), 401)
+  response.headers['Content-Type'] = 'application/json'
+  return response
+#Obtener el codigo de autorizacion
+code = request.data
+
+try = 
+#Mejorar (upgrade) el codigo de autorizacion en credenciales objecto (credentials object)
+  oauth_flow = flow_from_clientsecrets('client_secrets.json', scope ='') 
+  oauth_flow.redirect_uri = 'postmessage'
+  credentials = oauth_flow.step2_exchange(code)
+
+except FlowExchangeError:
+    response = make_response (
+          json.dumps('Failed to upgrade authorization code.'), 401)
+    response.headers['Content_Type'] = 'application/json'
+    return response
+# Verificar si el token es valido
+access_token = credentials.access_token
+url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'% access_token)
+h = httplib2.Http()
+result = json.loads(h.request(url, 'GET') [1])
+# Si hay un error en el acceso a la informacion del token...abortar
+if result.get('error') is not None:
+  response = make_response(json.dumps(result.get('error')), 500)
+  reponse.headers['Content_Type'] = 'application/json'
+  return reponse
+# Verificar si el token de acceso ( access token) es usado por el  destinado usuario (intended user)
+gplus_id = credentials.id_token['sub']
+if result['user_id'] != gplus_id:
+  response = make_response(
+    json.dumps("Token 's user ID doesn't match given user ID."), 401)
+    response.headers['Content_Type'] = 'application/json'
+    return reponse
+# Verificar si el token de acceso es valido para la app
+if result ['issued_to'] != CLIENT_ID:
+  response= make_response (
+    json.dumps("Token's client ID doesn't match app's."), 401)
+    print "Token's client ID doesn't match app's "
+    response.headers['Content_Type'] = 'application/json'
+    return reponse
+
+stored_credentials = login_session.get('credentials')
+stored_gplus_id =login_session.get('gplus_id')
+if stored_credentials in not None  and gplus_id == stored_gplus_id:
+  response = make_response(json.dumps('Current user is already connected.'), 200)
+  response.headers['Content_Type'] = 'application/json'
+  return response
+
+# Almacena el token de acceso ( access token) en la sesion para un uso posterior
+login_session ['credentials'] = credentials
+login_session ['gplus_id'] = gplus_id
+
+# Cogemos la informacion del usuario
+userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+params = {'access_token': credentials.access_token, 'alt': 'json'}
+answer = requests.get(userinfo_url, params=params)
+
+data = answer.json()
+
+login_session['username']= data['name']
+login_session['picture'] = data ['picture']
+login_session['email'] = data['email']
+
+output = ''
+output += '<h1> Welcome, '
+output += login_session['username']
+output += '! </h1>'
+output +=<'<img src="'
+output += login_session['picture']
+output += ' " style= "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;">'
+flash(" You are now logged in as : %s" % login_session['username'])
+print "done!"
+return output 
+

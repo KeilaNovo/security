@@ -2,17 +2,17 @@
 # Validacion del state token (token de estado)
 def gconnect():
   if request.args.get('state') != login_session ['state']:
-  response = make_response(json.dumps('Invalid parameter .'), 401)
-  response.headers['Content-Type'] = 'application/json'
-  return response
+    response = make_response(json.dumps('Invalid parameter .'), 401)
+    response.headers['Content-Type'] = 'application/json'
+    return response
 #Obtener el codigo de autorizacion
 code = request.data
 
-try = 
+try:
 #Mejorar (upgrade) el codigo de autorizacion en credenciales objecto (credentials object)
-  oauth_flow = flow_from_clientsecrets('client_secrets.json', scope ='') 
-  oauth_flow.redirect_uri = 'postmessage'
-  credentials = oauth_flow.step2_exchange(code)
+    oauth_flow = flow_from_clientsecrets('client_secrets.json', scope ='') 
+    oauth_flow.redirect_uri = 'postmessage'
+    credentials = oauth_flow.step2_exchange(code)
 
 except FlowExchangeError:
     response = make_response (

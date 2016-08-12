@@ -1,0 +1,4 @@
+if 'username' not in login_session:
+        return redirect('/login')
+        
+# When we want to access only logged people, if they aren't users of the web they will be redirected to the main page

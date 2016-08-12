@@ -28,25 +28,25 @@ result = json.loads(h.request(url, 'GET') [1])
 if result.get('error') is not None:
   response = make_response(json.dumps(result.get('error')), 500)
   reponse.headers['Content_Type'] = 'application/json'
-  return reponse
+  return response
 # Verificar si el token de acceso ( access token) es usado por el  destinado usuario (intended user)
 gplus_id = credentials.id_token['sub']
 if result['user_id'] != gplus_id:
   response = make_response(
     json.dumps("Token 's user ID doesn't match given user ID."), 401)
-    response.headers['Content_Type'] = 'application/json'
-    return reponse
+  response.headers['Content_Type'] = 'application/json'
+  return response
 # Verificar si el token de acceso es valido para la app
 if result ['issued_to'] != CLIENT_ID:
   response= make_response (
     json.dumps("Token's client ID doesn't match app's."), 401)
-    print "Token's client ID doesn't match app's "
-    response.headers['Content_Type'] = 'application/json'
-    return reponse
+  print "Token's client ID doesn't match app's "
+  response.headers['Content_Type'] = 'application/json'
+  return response
 
 stored_credentials = login_session.get('credentials')
 stored_gplus_id =login_session.get('gplus_id')
-if stored_credentials in not None  and gplus_id == stored_gplus_id:
+if stored_credentials is not None  and gplus_id == stored_gplus_id:
   response = make_response(json.dumps('Current user is already connected.'), 200)
   response.headers['Content_Type'] = 'application/json'
   return response
@@ -70,7 +70,7 @@ output = ''
 output += '<h1> Welcome, '
 output += login_session['username']
 output += '! </h1>'
-output +=<'<img src="'
+output +='<img src="'
 output += login_session['picture']
 output += ' " style= "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;">'
 flash(" You are now logged in as : %s" % login_session['username'])
